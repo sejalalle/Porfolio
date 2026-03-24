@@ -86,7 +86,13 @@ body:has(button:hover) .cursor-follower {
   transition: opacity 0.6s ease, visibility 0.6s ease;
 }
 
-.loader.hidden { opacity: 0; visibility: hidden; }
+/* FIX: fully remove loader from layout so it can't block clicks or scroll */
+.loader.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  display: none !important;
+}
 
 .loader-inner { text-align: center; }
 
