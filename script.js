@@ -1,5 +1,5 @@
 /* =============================================
-   SEJAL ALLE — PORTFOLIO SCRIPT (GSAP Fixed)
+   SEJAL ALLE — PORTFOLIO SCRIPT (GSAP + Theme Toggle)
    ============================================= */
 
 console.log('✅ SCRIPT RUNNING');
@@ -19,6 +19,47 @@ document.head.appendChild(_styleEl);
 
 
 /* =============================================
+   THEME TOGGLE — Light / Dark
+   ============================================= */
+const htmlEl      = document.documentElement;
+const themeToggle = document.getElementById('themeToggle');
+
+// Load saved preference (default = dark)
+const savedTheme = localStorage.getItem('portfolio-theme') || 'dark';
+htmlEl.setAttribute('data-theme', savedTheme);
+
+function applyThemeTogglerUI(theme) {
+  if (!themeToggle) return;
+  themeToggle.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+}
+
+applyThemeTogglerUI(savedTheme);
+
+if (themeToggle) {
+  themeToggle.addEventListener('click', () => {
+    const current = htmlEl.getAttribute('data-theme');
+    const next    = current === 'dark' ? 'light' : 'dark';
+    htmlEl.setAttribute('data-theme', next);
+    localStorage.setItem('portfolio-theme', next);
+    applyThemeTogglerUI(next);
+
+    // Animate toggle track with GSAP if available
+    if (typeof gsap !== 'undefined') {
+      const track = themeToggle.querySelector('.toggle-track');
+      if (track) {
+        gsap.fromTo(track,
+          { scale: 0.8 },
+          { scale: 1, duration: 0.35, ease: 'back.out(2)' }
+        );
+      }
+    }
+
+    console.log(`🎨 Theme switched to: ${next}`);
+  });
+}
+
+
+/* =============================================
    SAFETY: if GSAP never loaded, bail gracefully
    ============================================= */
 if (typeof gsap === 'undefined') {
@@ -35,26 +76,24 @@ if (typeof gsap === 'undefined') {
 
   /* ──────────────────────────────────────────
      LOADER — with hard 4s safety-net timeout
-     so a broken/missing image never locks the page
   ─────────────────────────────────────────── */
   const loader = document.getElementById('loader');
 
-  // Hide scrollbar while loader is visible
   document.body.style.overflow = 'hidden';
 
   function finishLoader() {
-    if (loader._done) return;   // prevent double-fire
+    if (loader._done) return;
     loader._done = true;
     console.log('✅ LOADER FINISHED');
 
     gsap.to(loader, {
       opacity: 0, duration: 0.55, ease: 'power2.inOut',
       onComplete: () => {
-        loader.style.display    = 'none';   // FIX: display:none, not just opacity
+        loader.style.display    = 'none';
         loader.style.visibility = 'hidden';
-        loader.style.pointerEvents = 'none'; // FIX: never block clicks
-        document.body.style.overflow = '';  // FIX: restore scroll
-        ScrollTrigger.refresh();            // FIX: recalculate positions post-loader
+        loader.style.pointerEvents = 'none';
+        document.body.style.overflow = '';
+        ScrollTrigger.refresh();
         initHeroAnimation();
         initTyping();
         console.log('✅ ScrollTrigger refreshed, hero animations started');
@@ -62,34 +101,26 @@ if (typeof gsap === 'undefined') {
     });
   }
 
-  // Loader play animation
-  const loaderTl = gsap.timeline({
-    onComplete: finishLoader  // fires when animation is done
-  });
+  const loaderTl = gsap.timeline({ onComplete: finishLoader });
   loaderTl
     .from('.loader-name', { opacity: 0, y: 40, duration: 0.55, ease: 'back.out(1.5)' })
     .from('.loader-fill', { scaleX: 0, transformOrigin: 'left center', duration: 1.5, ease: 'power2.inOut' }, 0.15);
 
-  // FIX: Hard safety-net — if loader somehow hangs (missing images, etc.) bail after 4s
   const loaderSafetyNet = setTimeout(() => {
     console.warn('⚠️ Loader safety-net fired — forcing finish');
     loaderTl.kill();
     finishLoader();
   }, 4000);
 
-  // FIX: Also listen for window.load — fire loader finish once ALL assets are loaded
   window.addEventListener('load', () => {
-    clearTimeout(loaderSafetyNet); // assets loaded — clear the hard timeout
-    // Give the loader animation a tiny moment to complete gracefully
+    clearTimeout(loaderSafetyNet);
     setTimeout(finishLoader, 400);
   });
 
-  // FIX: ScrollTrigger refresh on window resize
   window.addEventListener('resize', () => {
     ScrollTrigger.refresh();
   });
 
-  // FIX: Refresh ScrollTrigger when all assets load too
   window.addEventListener('load', () => {
     setTimeout(() => ScrollTrigger.refresh(), 200);
   });
@@ -102,7 +133,6 @@ if (typeof gsap === 'undefined') {
   const follower = document.getElementById('cursorFollower');
 
   if (window.innerWidth > 768 && cursor && follower) {
-    // Set initial position off-screen so cursor doesn't flash at 0,0
     gsap.set([cursor, follower], { x: -100, y: -100 });
 
     document.addEventListener('mousemove', (e) => {
@@ -110,12 +140,11 @@ if (typeof gsap === 'undefined') {
       gsap.to(follower, { x: e.clientX, y: e.clientY, duration: 0.22, ease: 'power2.out', overwrite: true });
     });
 
-    // Show cursor once mouse moves (avoid flash on page load)
     document.addEventListener('mousemove', () => {
       gsap.set([cursor, follower], { opacity: 1 });
     }, { once: true });
 
-    gsap.set([cursor, follower], { opacity: 0 }); // hidden until first move
+    gsap.set([cursor, follower], { opacity: 0 });
 
     const hoverTargets = document.querySelectorAll('a, button, .skill-card, .project-card, .contact-item, .highlight-item');
     hoverTargets.forEach(el => {
@@ -143,7 +172,6 @@ if (typeof gsap === 'undefined') {
     console.error('❌ Navbar elements missing from DOM');
   }
 
-  // Navbar drops in — delayed to let loader finish first
   gsap.from('.navbar', { y: -80, opacity: 0, duration: 0.7, delay: 0.1 });
 
   window.addEventListener('scroll', () => {
@@ -151,7 +179,7 @@ if (typeof gsap === 'undefined') {
     const btt = document.getElementById('backToTop');
     if (btt) btt.classList.toggle('visible', window.scrollY > 400);
     updateActiveNav();
-  }, { passive: true }); // FIX: passive listener for scroll performance
+  }, { passive: true });
 
   menuToggle.addEventListener('click', () => {
     const isOpen = navLinks.classList.toggle('open');
@@ -199,7 +227,6 @@ if (typeof gsap === 'undefined') {
      HERO ANIMATION — called after loader done
   ─────────────────────────────────────────── */
   function initHeroAnimation() {
-    // Guard: make sure hero elements exist
     if (!document.querySelector('.hero-badge')) {
       console.warn('⚠️ Hero elements not found');
       return;
@@ -219,7 +246,6 @@ if (typeof gsap === 'undefined') {
       .from('.floating-card',      { y: 30, opacity: 0, duration: 0.5, stagger: 0.15, ease: 'back.out(1.4)' }, '-=0.3')
       .from('.scroll-down',        { opacity: 0, y: 12, duration: 0.45 }, '-=0.2');
 
-    // Parallax blobs on mouse move
     const blob1 = document.querySelector('.blob-1');
     const blob2 = document.querySelector('.blob-2');
     if (blob1 && blob2) {
@@ -231,7 +257,6 @@ if (typeof gsap === 'undefined') {
       }, { passive: true });
     }
 
-    // Magnetic hero image (desktop)
     const imgFrame = document.querySelector('.image-frame');
     if (imgFrame && window.innerWidth > 900) {
       imgFrame.addEventListener('mousemove', (e) => {
@@ -254,7 +279,7 @@ if (typeof gsap === 'undefined') {
     const subtitleEl = document.querySelector('.hero-subtitle');
     if (!subtitleEl) return;
 
-    const texts = ['Full-Stack Developer', 'UI/UX Enthusiast', 'Problem Solver', 'B.Tech IT Student'];
+    const texts = ['Full-Stack Developer', 'Curious Learner', 'Problem Solver', 'B.Tech IT Student'];
     let idx = 0, charIdx = 0, deleting = false;
     let typingTimer = null;
 
@@ -276,16 +301,12 @@ if (typeof gsap === 'undefined') {
 
   /* ──────────────────────────────────────────
      SCROLL ANIMATIONS
-     All wrapped in a single DOMContentLoaded
-     to ensure elements exist before animating
   ─────────────────────────────────────────── */
   document.addEventListener('DOMContentLoaded', initScrollAnimations);
-  // Also call directly in case DOMContentLoaded already fired
   if (document.readyState !== 'loading') initScrollAnimations();
 
   function initScrollAnimations() {
 
-    // ── Section labels (global) ──
     gsap.utils.toArray('.section-label').forEach(el => {
       gsap.from(el, {
         scrollTrigger: { trigger: el, start: 'top 88%', once: true },
@@ -346,16 +367,13 @@ if (typeof gsap === 'undefined') {
 
     gsap.utils.toArray('.skill-card').forEach((card, i) => {
       gsap.from(card, {
-        scrollTrigger: { trigger: card, start: 'top 88%', once: true },
+        scrollTrigger: { trigger: card, start: 'top 95%', once: true },
         y: 60, opacity: 0, duration: 0.7, delay: i * 0.13
       });
 
-      gsap.from(card.querySelectorAll('.skill-tags span'), {
-        scrollTrigger: { trigger: card, start: 'top 82%', once: true },
-        y: 16, opacity: 0, duration: 0.4, stagger: 0.055, delay: 0.3 + i * 0.1
-      });
+      // NOTE: .skill-tag elements are NOT animated by GSAP — they are
+      // always visible via CSS. Only the card wrapper gets the entrance animation.
 
-      // Hover
       card.addEventListener('mouseenter', () => gsap.to(card, { y: -10, duration: 0.3, ease: 'power2.out' }));
       card.addEventListener('mouseleave', () => gsap.to(card, { y: 0,   duration: 0.5, ease: 'elastic.out(1,0.5)' }));
     });
@@ -412,7 +430,6 @@ if (typeof gsap === 'undefined') {
         });
       }
 
-      // 3D tilt — desktop only
       if (window.innerWidth > 900) {
         card.addEventListener('mousemove', (e) => {
           const rect = card.getBoundingClientRect();
@@ -479,7 +496,6 @@ if (typeof gsap === 'undefined') {
       y: 20, opacity: 0, duration: 0.45, stagger: 0.1, delay: 0.2
     });
 
-    // ── FOOTER ──
     gsap.from('.footer-logo, .footer-links, .footer-copy', {
       scrollTrigger: { trigger: 'footer', start: 'top 93%', once: true },
       y: 20, opacity: 0, duration: 0.55, stagger: 0.12
@@ -500,7 +516,7 @@ if (typeof gsap === 'undefined') {
 
 
   /* ──────────────────────────────────────────
-     SMOOTH SCROLL — GSAP ScrollToPlugin
+     SMOOTH SCROLL
   ─────────────────────────────────────────── */
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', (e) => {
@@ -569,7 +585,6 @@ if (typeof gsap === 'undefined') {
         return;
       }
 
-      // Loading state
       const btnText    = submitBtn.querySelector('.btn-text');
       const btnLoading = submitBtn.querySelector('.btn-loading');
       const btnIcon    = submitBtn.querySelector('.btn-icon');
@@ -588,8 +603,7 @@ if (typeof gsap === 'undefined') {
       submitBtn.disabled = false;
       gsap.to(submitBtn, { scale: 1, duration: 0.3, ease: 'back.out(2)' });
 
-      // Success message
-      formSuccess.style.display = 'flex'; // make visible before animation
+      formSuccess.style.display = 'flex';
       formSuccess.classList.add('visible');
       gsap.fromTo(formSuccess,
         { y: 16, opacity: 0 },
@@ -608,7 +622,6 @@ if (typeof gsap === 'undefined') {
       }, 5000);
     });
 
-    // Real-time clear errors + focus micro
     contactForm.querySelectorAll('input, textarea').forEach(el => {
       el.addEventListener('input', () => {
         const err = document.getElementById(el.id + 'Error');
@@ -625,6 +638,5 @@ if (typeof gsap === 'undefined') {
       onComplete: () => gsap.set(el, { x: 0 })
     });
   }
-
 
 } // end gsap safety check

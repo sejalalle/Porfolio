@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -34,9 +34,17 @@
         <li><a href="#projects" class="nav-link">Projects</a></li>
         <li><a href="#contact" class="nav-link">Contact</a></li>
       </ul>
-      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
-        <span></span><span></span><span></span>
-      </button>
+      <div class="nav-right">
+        <!-- Theme Toggle -->
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="theme-icon theme-icon--sun"><i class="fas fa-sun"></i></span>
+          <span class="theme-icon theme-icon--moon"><i class="fas fa-moon"></i></span>
+          <span class="toggle-track"></span>
+        </button>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
     </div>
   </nav>
 
@@ -160,47 +168,64 @@
       <div class="section-label">What I Know</div>
       <h2 class="section-title" data-reveal>Skills &amp; Expertise</h2>
       <p class="section-desc" data-reveal>A toolkit built through real projects and relentless curiosity.</p>
+
       <div class="skills-grid" data-reveal>
+
+        <!-- Frontend Card -->
         <div class="skill-card">
-          <div class="skill-card-icon">
-            <i class="fas fa-laptop-code"></i>
+          <div class="skill-card-header">
+            <div class="skill-card-icon">
+              <i class="fas fa-laptop-code"></i>
+            </div>
+            <h3>Frontend</h3>
+            <p class="skill-card-desc">Building beautiful, responsive interfaces that users love.</p>
           </div>
-          <h3>Frontend</h3>
           <div class="skill-tags">
-            <span>HTML5</span>
-            <span>CSS3</span>
-            <span>JavaScript</span>
-            <span>React</span>
-            <span>Responsive Design</span>
+            <span class="skill-tag"><i class="fab fa-html5"></i> HTML5</span>
+            <span class="skill-tag"><i class="fab fa-css3-alt"></i> CSS3</span>
+            <span class="skill-tag"><i class="fab fa-js"></i> JavaScript</span>
+            <span class="skill-tag"><i class="fab fa-react"></i> React</span>
+            <span class="skill-tag"><i class="fas fa-mobile-alt"></i> Responsive Design</span>
           </div>
         </div>
+
+        <!-- Backend Card -->
         <div class="skill-card skill-card--accent">
-          <div class="skill-card-icon">
-            <i class="fas fa-server"></i>
+          <div class="skill-card-header">
+            <div class="skill-card-icon">
+              <i class="fas fa-server"></i>
+            </div>
+            <h3>Backend</h3>
+            <p class="skill-card-desc">Powering applications with robust server-side logic and databases.</p>
           </div>
-          <h3>Backend</h3>
           <div class="skill-tags">
-            <span>Node.js</span>
-            <span>Python</span>
-            <span>Express</span>
-            <span>MongoDB</span>
-            <span>PHP</span>
-            <span>MySQL</span>
-            <span>REST APIs</span>
+            <span class="skill-tag"><i class="fab fa-node-js"></i> Node.js</span>
+            <span class="skill-tag"><i class="fab fa-python"></i> Python</span>
+            <span class="skill-tag"><i class="fas fa-cube"></i> Express</span>
+            <span class="skill-tag"><i class="fas fa-leaf"></i> MongoDB</span>
+            <span class="skill-tag"><i class="fab fa-php"></i> PHP</span>
+            <span class="skill-tag"><i class="fas fa-database"></i> MySQL</span>
+            <span class="skill-tag"><i class="fas fa-exchange-alt"></i> REST APIs</span>
           </div>
         </div>
+
+        <!-- Design & Tools Card -->
         <div class="skill-card">
-          <div class="skill-card-icon">
-            <i class="fas fa-palette"></i>
+          <div class="skill-card-header">
+            <div class="skill-card-icon">
+              <i class="fas fa-palette"></i>
+            </div>
+            <h3>Design &amp; Tools</h3>
+            <p class="skill-card-desc">Designing with precision and managing code with industry tools.</p>
           </div>
-          <h3>Design &amp; Tools</h3>
           <div class="skill-tags">
-            <span>Figma</span>
-            <span>Git</span>
-            <span>VS Code</span>
-            <span>Android Studio</span>
+            <span class="skill-tag"><i class="fab fa-figma"></i> Figma</span>
+            <span class="skill-tag"><i class="fab fa-git-alt"></i> Git</span>
+            <span class="skill-tag"><i class="fas fa-code"></i> VS Code</span>
+            <span class="skill-tag"><i class="fab fa-android"></i> Android Studio</span>
           </div>
         </div>
+
       </div>
     </div>
   </section>
